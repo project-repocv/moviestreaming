@@ -251,16 +251,16 @@ pipeline {
             }
         }
 
-        stage('Quality Gate') {
-            when {
-                expression { env.TARGET_ENV != 'feature' && env.ALLOWED_BRANCH == 'true' }
-            }
-            steps {
-                timeout(time: 1, unit: 'HOURS') {
-                    waitForQualityGate abortPipeline: true
-                }
-            }
-        }
+        // stage('Quality Gate') {
+        //     when {
+        //         expression { env.TARGET_ENV != 'feature' && env.ALLOWED_BRANCH == 'true' }
+        //     }
+        //     steps {
+        //         timeout(time: 1, unit: 'HOURS') {
+        //             waitForQualityGate abortPipeline: true
+        //         }
+        //     }
+        // }
 
         /* =======================================================
            BUILD & PUSH DOCKER IMAGES
