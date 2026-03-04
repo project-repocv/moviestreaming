@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: api-gateway
-        image: your-registry.com/cinevision/api-gateway:latest
+        image: 781863585922.dkr.ecr.us-east-1.amazonaws.com/cinevision/api-gateway:latest
         ports:
         - containerPort: 8080
         env:
