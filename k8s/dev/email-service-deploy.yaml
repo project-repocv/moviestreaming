@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: email-service
+  name: emailservice
   namespace: cinevision-dev
   labels:
-    app: email-service
+    app: emailservice
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: email-service
+      app: emailservice
   template:
     metadata:
       labels:
-        app: email-service
+        app: emailservice
     spec:
       containers:
-      - name: email-service
+      - name: emailservice
         image: your-registry.com/cinevision/email-service:latest
         ports:
         - containerPort: 8083
@@ -66,11 +66,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: email-service
+  name: emailservice
   namespace: cinevision-dev
 spec:
   selector:
-    app: email-service
+    app: emailservice
   ports:
   - port: 8083
     targetPort: 8083

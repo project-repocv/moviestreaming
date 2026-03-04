@@ -24,21 +24,21 @@ spec:
   - to:
     - podSelector:
         matchLabels:
-          app: movie-service
+          app: movieservice
     ports:
     - protocol: TCP
       port: 8081
   - to:
     - podSelector:
         matchLabels:
-          app: user-service
+          app: userservice
     ports:
     - protocol: TCP
       port: 8082
   - to:
     - podSelector:
         matchLabels:
-          app: email-service
+          app: emailservice
     ports:
     - protocol: TCP
       port: 8083
@@ -85,21 +85,21 @@ spec:
   - from:
     - podSelector:
         matchLabels:
-          app: movie-service
+          app: movieservice
     ports:
     - protocol: TCP
       port: 8761
   - from:
     - podSelector:
         matchLabels:
-          app: user-service
+          app: userservice
     ports:
     - protocol: TCP
       port: 8761
   - from:
     - podSelector:
         matchLabels:
-          app: email-service
+          app: emailservice
     ports:
     - protocol: TCP
       port: 8761
