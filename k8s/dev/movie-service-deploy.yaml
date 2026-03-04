@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: movie-service
+  name: movieservice
   namespace: cinevision-dev
   labels:
-    app: movie-service
+    app: movieservice
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: movie-service
+      app: movieservice
   template:
     metadata:
       labels:
-        app: movie-service
+        app: movieservice
     spec:
       containers:
-      - name: movie-service
+      - name: movieservice
         image: 781863585922.dkr.ecr.us-east-1.amazonaws.com/cinevision/movieservice:latest
         ports:
         - containerPort: 8081
@@ -73,11 +73,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: movie-service
+  name: movieservice
   namespace: cinevision-dev
 spec:
   selector:
-    app: movie-service
+    app: movieservice
   ports:
   - port: 8081
     targetPort: 8081

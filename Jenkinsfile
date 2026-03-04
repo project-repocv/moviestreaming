@@ -389,9 +389,11 @@ pipeline {
                                     'frontend'
                                 ]
                                 services.each { service ->
+                                    def lowerService = service.toLowerCase()
+
                                     sh """
-                                        kubectl set image deployment/${service} \
-                                        ${service}=${ECR_REGISTRY}/cinevision/${service}:${IMAGE_TAG} \
+                                        kubectl set image deployment/${lowerService} \
+                                        ${lowerService}=${ECR_REGISTRY}/cinevision/${lowerService}:${IMAGE_TAG} \
                                         -n cinevision-${TARGET_ENV} --record
                                     """
                                 }
