@@ -391,8 +391,9 @@ pipeline {
 
 
                                 def services = [
-                                    'api-gateway',
+
                                     'movieService',
+                                    'api-gateway',
                                     'userService',
                                     'emailService',
                                     'eureka-server',
