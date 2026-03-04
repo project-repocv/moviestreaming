@@ -366,9 +366,30 @@ pipeline {
             }
             steps {
                 dir("k8s/${env.TARGET_ENV}") {
+
+                    
                     withAWS(credentials: 'aws-credentials', region: 'us-east-1') {
                         withKubeConfig(credentialsId: 'kubeconfig') {
                             script {
+
+                                // ---------- VERIFICATION STEPS ----------
+                                echo "=== Verifying AWS credentials ==="
+                                sh 'aws sts get-caller-identity'
+
+                                echo "=== Generating EKS token ==="
+                                // This should return a JSON token – if it fails, check IAM permissions
+                                sh 'aws eks get-token --cluster-name dev-cinevision-cluster --region us-east-1'
+
+                                echo "=== Current kubectl context (should be EKS) ==="
+                                sh 'kubectl config view --minify'
+                                sh 'kubectl config current-context'
+
+                                // Optional: verbose kubectl to see exec plugin details
+                                // sh 'kubectl --v=8 get nodes'
+
+                                // ---------- DEPLOYMENT ----------  
+
+
                                 def services = [
                                     'api-gateway',
                                     'movieService',
