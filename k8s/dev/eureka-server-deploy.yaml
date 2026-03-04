@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: eureka-server
-        image: your-registry.com/cinevision/eureka-server:latest   # replace with your image
+        image: 781863585922.dkr.ecr.us-east-1.amazonaws.com/cinevision/eureka-server:latest   # replace with your image
         ports:
         - containerPort: 8761
         env:

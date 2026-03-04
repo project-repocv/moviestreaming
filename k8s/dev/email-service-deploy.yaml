@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: emailservice
-        image: your-registry.com/cinevision/email-service:latest
+        image: 781863585922.dkr.ecr.us-east-1.amazonaws.com/cinevision/emailservice:latest
         ports:
         - containerPort: 8083
         env:
