@@ -235,11 +235,11 @@ pipeline {
                 withSonarQubeEnv('SonarQube') {
                     script {
                         def backendServices = [
-                            'api-gateway',
+                            // 'api-gateway',
                             'movieService',
-                            'userService',
-                            'emailService',
-                            'eureka-server'
+                            // 'userService',
+                            // 'emailService',
+                            // 'eureka-server'
                         ]
                         backendServices.each { service ->
                             dir("backend/${service}") {
