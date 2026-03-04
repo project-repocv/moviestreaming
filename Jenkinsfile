@@ -359,7 +359,7 @@ pipeline {
         /* ======================================================
            DEPLOY TO KUBERNETES
            (k8s manifests remain at root /k8s)
-        ======================================================= */
+        ======================================================== */
         stage('Deploy to Kubernetes') {
             when {
                 expression { env.TARGET_ENV != 'feature' && env.ALLOWED_BRANCH == 'true' }
