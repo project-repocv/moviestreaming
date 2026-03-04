@@ -372,22 +372,11 @@ pipeline {
                         withKubeConfig(credentialsId: 'kubeconfig') {
                             script {
 
-                                // ---------- VERIFICATION STEPS ----------
-                                echo "=== Verifying AWS credentials ==="
-                                sh 'aws sts get-caller-identity'
+                                // 1. Ensure the namespace exists
+                                sh "kubectl create namespace cinevision-${TARGET_ENV} --dry-run=client -o yaml | kubectl apply -f -"
 
-                                echo "=== Generating EKS token ==="
-                                // This should return a JSON token – if it fails, check IAM permissions
-                                sh 'aws eks get-token --cluster-name dev-cinevision-cluster --region us-east-1'
-
-                                echo "=== Current kubectl context (should be EKS) ==="
-                                sh 'kubectl config view --minify'
-                                sh 'kubectl config current-context'
-
-                                // Optional: verbose kubectl to see exec plugin details
-                                // sh 'kubectl --v=8 get nodes'
-
-                                // ---------- DEPLOYMENT ------------ 
+                                // 2. Apply all Kubernetes manifests from the current directory
+                                sh "kubectl apply -f . -n cinevision-${TARGET_ENV}"
 
 
                                 def services = [
