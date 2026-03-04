@@ -161,13 +161,13 @@ pipeline {
             when { expression { env.ALLOWED_BRANCH == 'true' } }
             parallel {
 
-                stage('API Gateway') {
-                    steps {
-                        dir('backend/api-gateway') {
-                            sh 'mvn clean package'
-                        }
-                    }
-                }
+                // stage('API Gateway') {
+                //     steps {
+                //         dir('backend/api-gateway') {
+                //             sh 'mvn clean package'
+                //         }
+                //     }
+                // }
 
                 stage('Movie Service') {
                     steps {
@@ -177,50 +177,50 @@ pipeline {
                     }
                 }
 
-                stage('User Service') {
-                    steps {
-                        dir('backend/userService') {
-                            sh 'mvn clean package'
-                        }
-                    }
-                }
+                // stage('User Service') {
+                //     steps {
+                //         dir('backend/userService') {
+                //             sh 'mvn clean package'
+                //         }
+                //     }
+                // }
 
-                stage('Email Service') {
-                    steps {
-                        dir('backend/emailService') {
-                            sh 'mvn clean package'
-                        }
-                    }
-                }
+                // stage('Email Service') {
+                //     steps {
+                //         dir('backend/emailService') {
+                //             sh 'mvn clean package'
+                //         }
+                //     }
+                // }
 
-                stage('Eureka Server') {
-                    steps {
-                        dir('backend/eureka-server') {
-                            sh 'mvn clean package'
-                        }
-                    }
-                }
+                // stage('Eureka Server') {
+                //     steps {
+                //         dir('backend/eureka-server') {
+                //             sh 'mvn clean package'
+                //         }
+                //     }
+                // }
 
-                stage('Frontend (React)') {
-                    agent {
-                        docker {
-                            image 'node:20'
-                            args '-u root'
-                        }
-                    }
-                    steps {
-                        script {
-                            catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
-                                dir('frontend') {
-                                    sh '''
-                                        npm ci
-                                        CI=false npm run build
-                                    '''
-                                }
-                            }
-                        }
-                    }
-                }
+                // stage('Frontend (React)') {
+                //     agent {
+                //         docker {
+                //             image 'node:20'
+                //             args '-u root'
+                //         }
+                //     }
+                //     steps {
+                //         script {
+                //             catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
+                //                 dir('frontend') {
+                //                     sh '''
+                //                         npm ci
+                //                         CI=false npm run build
+                //                     '''
+                //                 }
+                //             }
+                //         }
+                //     }
+                // }
             }
         }
 
