@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cinevision-dev
+  labels:
+    name: cinevision-dev
+    environment: development
