@@ -226,7 +226,7 @@ pipeline {
 
         /* ======================================================
            SONARQUBE ANALYSIS (only backend services)
-        ======================================================= */
+        ======================================================== */
         stage('SonarQube Analysis') {
             when {
                 expression { env.TARGET_ENV != 'feature' && env.ALLOWED_BRANCH == 'true' }
