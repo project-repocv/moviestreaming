@@ -366,27 +366,29 @@ pipeline {
             }
             steps {
                 dir("k8s/${env.TARGET_ENV}") {
-                    withKubeConfig(credentialsId: 'kubeconfig') {
-                        script {
-                            def services = [
-                                'api-gateway',
-                                'movieService',
-                                'userService',
-                                'emailService',
-                                'eureka-server',
-                                'frontend'
-                            ]
-                            services.each { service ->
-                                sh """
-                                    kubectl set image deployment/${service} \
-                                    ${service}=${ECR_REGISTRY}/cinevision/${service}:${IMAGE_TAG} \
-                                    -n cinevision-${TARGET_ENV} --record
-                                """
+                    withAWS(credentials: 'aws-credentials', region: 'us-east-1') {
+                        withKubeConfig(credentialsId: 'kubeconfig') {
+                            script {
+                                def services = [
+                                    'api-gateway',
+                                    'movieService',
+                                    'userService',
+                                    'emailService',
+                                    'eureka-server',
+                                    'frontend'
+                                ]
+                                services.each { service ->
+                                    sh """
+                                        kubectl set image deployment/${service} \
+                                        ${service}=${ECR_REGISTRY}/cinevision/${service}:${IMAGE_TAG} \
+                                        -n cinevision-${TARGET_ENV} --record
+                                    """
+                                }
+                                sh "kubectl rollout status deployment -n cinevision-${TARGET_ENV}"
                             }
-                            sh "kubectl rollout status deployment -n cinevision-${TARGET_ENV}"
                         }
-                    }
-                }
+                    }    
+                }   
             }
         }
     }
