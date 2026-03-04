@@ -387,7 +387,7 @@ pipeline {
                                 // Optional: verbose kubectl to see exec plugin details
                                 // sh 'kubectl --v=8 get nodes'
 
-                                // ---------- DEPLOYMENT ----------  
+                                // ---------- DEPLOYMENT ----------- 
 
 
                                 def services = [
