@@ -63,5 +63,14 @@
         </dependency>
     </dependencies>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <!-- Version is inherited from parent's pluginManagement -->
+            </plugin>
+        </plugins>
+    </build>
 
 </project>
