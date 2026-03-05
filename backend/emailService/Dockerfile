@@ -1,5 +1,5 @@
 # api-gateway/Dockerfile
-FROM eclipse-temurin:17-jre-alpine
+FROM eclipse-temurin:21-jre-alpine
 
 # Create a non-root user
 RUN addgroup -S cinevision && adduser -S cinevision -G cinevision -u 1000
