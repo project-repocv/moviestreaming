@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>CineVisionMicroservice</artifactId>
@@ -10,16 +10,16 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>api-gateway</artifactId>
+    <packaging>jar</packaging> <!-- Explicitly define packaging as jar -->
 
     <name>api-gateway</name>
-    <!-- FIXME change it to the project's website -->
     <url>http://www.example.com</url>
- 
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.7</maven.compiler.source>
-        <maven.compiler.target>1.7</maven.compiler.target>
+        <!-- Set Java version to 1.8 (or higher, e.g., 11/17, depending on your Spring Boot version) -->
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
 
     <dependencies>
@@ -37,10 +37,10 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.boot</groupId>-->
-<!--            <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.springframework.boot</groupId>-->
+        <!--            <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>-->
+        <!--        </dependency>-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
@@ -57,20 +57,26 @@
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>8</source>
-                    <target>8</target>
-                </configuration>
-            </plugin>
+            <!-- Remove the standalone maven-compiler-plugin; Spring Boot plugin handles compiler settings via properties -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <!-- Version is inherited from parent's pluginManagement -->
+                <!-- Version is typically inherited from Spring Boot parent or pluginManagement -->
+                <!-- Add an explicit execution for the repackage goal to ensure the executable JAR is created -->
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <!-- Optional: Configure the plugin to produce a fully executable JAR for Linux/Unix (if needed) -->
+                <!--
+                <configuration>
+                    <executable>true</executable>
+                </configuration>
+                -->
             </plugin>
         </plugins>
-    </build> 
-    
+    </build>
 </project>
