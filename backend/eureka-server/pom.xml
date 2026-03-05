@@ -50,11 +50,5 @@
         </plugins>
     </build>
 
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>repackage</goal>
-                        </goals>
-                    </execution>
-                </executions>
+
 </project>
