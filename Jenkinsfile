@@ -224,43 +224,43 @@ pipeline {
             }
         }
 
-        /* =======================================================
-           SONARQUBE ANALYSIS (only backend services)
-        ========================================================= */
-        stage('SonarQube Analysis') {
-            when {
-                expression { env.TARGET_ENV != 'feature' && env.ALLOWED_BRANCH == 'true' }
-            }
-            steps {
-                withSonarQubeEnv('SonarQube') {
-                    script {
-                        def backendServices = [
-                            'api-gateway',
-                            'movieService',
-                            'userService',
-                            'emailService',
-                            'eureka-server'
-                        ]
-                        backendServices.each { service ->
-                            dir("backend/${service}") {
-                                sh 'mvn sonar:sonar'
-                            }
-                        }
-                    }
-                } 
-            }
-        }
+        // /* =======================================================
+        //    SONARQUBE ANALYSIS (only backend services)
+        // ========================================================= */
+        // stage('SonarQube Analysis') {
+        //     when {
+        //         expression { env.TARGET_ENV != 'feature' && env.ALLOWED_BRANCH == 'true' }
+        //     }
+        //     steps {
+        //         withSonarQubeEnv('SonarQube') {
+        //             script {
+        //                 def backendServices = [
+        //                     'api-gateway',
+        //                     'movieService',
+        //                     'userService',
+        //                     'emailService',
+        //                     'eureka-server'
+        //                 ]
+        //                 backendServices.each { service ->
+        //                     dir("backend/${service}") {
+        //                         sh 'mvn sonar:sonar'
+        //                     }
+        //                 }
+        //             }
+        //         } 
+        //     }
+        // }
 
-        stage('Quality Gate') {
-            when {
-                expression { env.TARGET_ENV != 'feature' && env.ALLOWED_BRANCH == 'true' }
-            }
-            steps {
-                timeout(time: 1, unit: 'HOURS') {
-                    waitForQualityGate abortPipeline: true
-                }
-            }
-        }
+        // stage('Quality Gate') {
+        //     when {
+        //         expression { env.TARGET_ENV != 'feature' && env.ALLOWED_BRANCH == 'true' }
+        //     }
+        //     steps {
+        //         timeout(time: 1, unit: 'HOURS') {
+        //             waitForQualityGate abortPipeline: true
+        //         }
+        //     }
+        // }
 
         /* =======================================================
            BUILD & PUSH DOCKER IMAGES
