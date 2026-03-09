@@ -8,14 +8,14 @@ pipeline {
         PROD_BRANCH = 'main'
 
         // AWS / ECR
-        AWS_ACCOUNT_ID = '590396427103'
+        AWS_ACCOUNT_ID = '781863585922'
         AWS_DEFAULT_REGION = 'us-east-1'
         ECR_REGISTRY = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
 
 
 
-        DEV_TARGET_ACCOUNT   = '781863585922'   // if dev is separate
-        STAGING_TARGET_ACCOUNT = '222222222222'
+        DEV_TARGET_ACCOUNT   = '590396427103'   // if dev is separate
+        STAGING_TARGET_ACCOUNT = '590396427103'
         PROD_TARGET_ACCOUNT  = '333333333333'
 
         // EKS cluster names per environment
@@ -291,7 +291,7 @@ pipeline {
                 expression { env.TARGET_ENV != 'feature' && env.ALLOWED_BRANCH == 'true' }
             }
             steps {
-                withAWS(region: "${AWS_DEFAULT_REGION}", credentials: 'aws-credentials1') {
+                withAWS(region: "${AWS_DEFAULT_REGION}", credentials: 'aws-credentials') {
                     script {
                         sh """
                             aws ecr get-login-password --region ${AWS_DEFAULT_REGION} \
