@@ -291,7 +291,7 @@ pipeline {
                 expression { env.TARGET_ENV != 'feature' && env.ALLOWED_BRANCH == 'true' }
             }
             steps {
-                withAWS(region: "${AWS_DEFAULT_REGION}", credentials: 'aws-credentials') {
+                withAWS(region: "${AWS_DEFAULT_REGION}", credentials: 'aws-credentials1') {
                     script {
                         sh """
                             aws ecr get-login-password --region ${AWS_DEFAULT_REGION} \
