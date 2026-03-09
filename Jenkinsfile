@@ -14,7 +14,7 @@ pipeline {
 
 
 
-        DEV_TARGET_ACCOUNT   = '590396427103'   // if dev is separate
+        DEV_TARGET_ACCOUNT   = '590396427103'   // if dev  is separate
         STAGING_TARGET_ACCOUNT = '590396427103'
         PROD_TARGET_ACCOUNT  = '333333333333'
 
