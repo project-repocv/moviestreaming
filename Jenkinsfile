@@ -8,29 +8,9 @@ pipeline {
         PROD_BRANCH = 'main'
 
         // AWS / ECR
-        AWS_ACCOUNT_ID = '781863585922'
+        AWS_ACCOUNT_ID = '590396427103'
         AWS_DEFAULT_REGION = 'us-east-1'
         ECR_REGISTRY = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
-
-
-
-        DEV_TARGET_ACCOUNT   = '590396427103'   // if dev  is separate
-        STAGING_TARGET_ACCOUNT = '590396427103'
-        PROD_TARGET_ACCOUNT  = '333333333333'
-
-        // EKS cluster names per environment
-        DEV_CLUSTER_NAME     = 'dev-cinevision-cluster'
-        STAGING_CLUSTER_NAME = 'staging-cinevision-cluster'
-        PROD_CLUSTER_NAME    = 'prod-cinevision-cluster'
-
-        // IAM role names (or full ARNs) to assume in each target account
-        // The role name must exist in the respective target account
-        DEV_DEPLOYER_ROLE    = 'jenkins-eks-deployer-dev'
-        STAGING_DEPLOYER_ROLE = 'jenkins-eks-deployer-staging'
-        PROD_DEPLOYER_ROLE   = 'jenkins-eks-deployer-prod'
-
-        // Optional external ID if you configured it
-        EXTERNAL_ID = 'your-secret-external-id'
 
         // Docker tagging
         COMMIT_HASH = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
@@ -385,64 +365,43 @@ pipeline {
                 expression { env.TARGET_ENV != 'feature' && env.ALLOWED_BRANCH == 'true' }
             }
             steps {
-                script {
-                    // Determine target account, cluster, and role based on environment
-                    def targetAccount = ""
-                    def clusterName = ""
-                    def deployerRole = ""
-                    def externalId = env.EXTERNAL_ID   // set if you use external ID
+                dir("k8s/${env.TARGET_ENV}") {
 
-                    switch (env.TARGET_ENV) {
-                        case 'dev':
-                            targetAccount = env.DEV_TARGET_ACCOUNT
-                            clusterName = env.DEV_CLUSTER_NAME
-                            deployerRole = env.DEV_DEPLOYER_ROLE
-                            break
-                        case 'staging':
-                            targetAccount = env.STAGING_TARGET_ACCOUNT
-                            clusterName = env.STAGING_CLUSTER_NAME
-                            deployerRole = env.STAGING_DEPLOYER_ROLE
-                            break
-                        case 'prod':
-                            targetAccount = env.PROD_TARGET_ACCOUNT
-                            clusterName = env.PROD_CLUSTER_NAME
-                            deployerRole = env.PROD_DEPLOYER_ROLE
-                            break
-                        default:
-                            error "Unknown target environment: ${env.TARGET_ENV}"
-                    }
+                    
+                    withAWS(credentials: 'aws-credentials', region: 'us-east-1') {
+                        withKubeConfig(credentialsId: 'kubeconfig') {
+                            script {
 
-                    // Assume role in the target account
-                    withAWS(region: "${AWS_DEFAULT_REGION}",
-                            credentials: 'aws-credentials1',   // source  credentialss
-                            role: "${deployerRole}",
-                            roleAccount: "${targetAccount}",
-                            externalId: "${externalId}") {
+                                // 1. Ensure the namespace exists
+                                sh "kubectl create namespace cinevision-${TARGET_ENV} --dry-run=client -o yaml | kubectl apply -f -"
 
-                        // Inside this block, the AWS CLI uses temporary credentials
-                        // from the assumed role.
+                                // 2. Apply all Kubernetes manifests from the current directory
+                                sh "kubectl apply -f . -n cinevision-${TARGET_ENV}"
 
-                        // Update kubeconfig to point to the target EKS cluster
-                        sh "aws eks update-kubeconfig --region ${AWS_DEFAULT_REGION} --name ${clusterName}"
 
-                        // Now run kubectl commands against the target cluster
-                        dir("k8s/${env.TARGET_ENV}") {
-                            sh "kubectl create namespace cinevision-${TARGET_ENV} --dry-run=client -o yaml | kubectl apply -f -"
-                            sh "kubectl apply -f . -n cinevision-${TARGET_ENV}"
+                                def services = [
 
-                            def services = ['movieService', 'api-gateway', 'userService', 'emailService', 'eureka-server', 'frontend']
-                            services.each { service ->
-                                def lowerService = service.toLowerCase()
-                                sh """
-                                    kubectl set image deployment/${lowerService} \
-                                    ${lowerService}=${ECR_REGISTRY}/cinevision/${lowerService}:${IMAGE_TAG} \
-                                    -n cinevision-${TARGET_ENV} --record
-                                """
+                                    'movieService', 
+                                    'api-gateway',
+                                    'userService',
+                                    'emailService',
+                                    'eureka-server',
+                                    'frontend'
+                                ]
+                                services.each { service ->
+                                    def lowerService = service.toLowerCase()
+
+                                    sh """
+                                        kubectl set image deployment/${lowerService} \
+                                        ${lowerService}=${ECR_REGISTRY}/cinevision/${lowerService}:${IMAGE_TAG} \
+                                        -n cinevision-${TARGET_ENV} --record
+                                    """
+                                }
+                                sh "kubectl rollout status deployment -n cinevision-${TARGET_ENV}"
                             }
-                            sh "kubectl rollout status deployment -n cinevision-${TARGET_ENV}"
                         }
-                    }
-                }
+                    }    
+                }   
             }
         }
     }
