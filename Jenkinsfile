@@ -414,7 +414,7 @@ pipeline {
 
                     // Assume role in the target account
                     withAWS(region: "${AWS_DEFAULT_REGION}",
-                            credentials: 'aws-credentials1',   // source  credentials
+                            credentials: 'aws-credentials1',   // source  credentialss
                             role: "${deployerRole}",
                             roleAccount: "${targetAccount}",
                             externalId: "${externalId}") {
