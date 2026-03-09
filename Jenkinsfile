@@ -29,7 +29,7 @@ pipeline {
         STAGING_DEPLOYER_ROLE = 'jenkins-eks-deployer-staging'
         PROD_DEPLOYER_ROLE   = 'jenkins-eks-deployer-prod'
 
-        // Optional external ID if you configured it
+        // Optional external ID if you configured  it
         EXTERNAL_ID = 'your-secret-external-id'
 
         // Docker tagging
