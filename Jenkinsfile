@@ -19,9 +19,9 @@ pipeline {
         PROD_TARGET_ACCOUNT  = '333333333333'
 
         // EKS cluster names per environment
-        DEV_CLUSTER_NAME     = 'dev-eks-cluster'
-        STAGING_CLUSTER_NAME = 'staging-eks-cluster'
-        PROD_CLUSTER_NAME    = 'prod-eks-cluster'
+        DEV_CLUSTER_NAME     = 'dev-cinevision-cluster'
+        STAGING_CLUSTER_NAME = 'staging-cinevision-cluster'
+        PROD_CLUSTER_NAME    = 'prod-cinevision-cluster'
 
         // IAM role names (or full ARNs) to assume in each target account
         // The role name must exist in the respective target account
