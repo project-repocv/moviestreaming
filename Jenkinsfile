@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+        tools {
+        maven 'Maven3.9'   // name must match the Jenkins tool configuration
+    }
+
     environment {
         // Branch mappings
         DEV_BRANCH = 'develop'
