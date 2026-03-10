@@ -156,7 +156,7 @@ pipeline {
            BUILD & TEST MICROSERVICES
            Backend services are under /backend/<service>
            Frontend is under /frontend
-        ======================================================= */
+        ======================================================== */
         stage('Build & Test Services') {
             when { expression { env.ALLOWED_BRANCH == 'true' } }
             parallel {
