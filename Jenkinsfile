@@ -380,7 +380,7 @@ pipeline {
                                 // 1. Ensure the namespace exists
                                 sh "kubectl create namespace cinevision-${TARGET_ENV} --dry-run=client -o yaml | kubectl apply -f -"
 
-                                // 2. Apply all Kubernetes manifests from the current directory
+                                // 2. Apply all Kubernetes manifests from the  current directory
                                 sh "kubectl apply -f . -n cinevision-${TARGET_ENV}"
 
 
