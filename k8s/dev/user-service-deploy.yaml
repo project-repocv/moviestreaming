@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: userservice
-        image: 781863585922.dkr.ecr.us-east-1.amazonaws.com/cinevision/userservice:latest
+        image: 590396427103.dkr.ecr.us-east-1.amazonaws.com/cinevision/userservice:latest
         ports:
         - containerPort: 8082
         env:
