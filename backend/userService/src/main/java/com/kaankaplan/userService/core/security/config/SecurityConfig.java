@@ -17,8 +17,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-
-
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -27,7 +25,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final UserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
-
 
     @Bean(BeanIds.AUTHENTICATION_MANAGER)
     @Override
@@ -47,10 +44,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .addFilterAfter(new TokenVerifierFilter(), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(authorize -> authorize
+                        // Permit unauthenticated access to authentication endpoints
                         .antMatchers(HttpMethod.POST, "/api/user/auth/**").permitAll()
                         .antMatchers("/api/user/users/**").permitAll()
+                        //  IMPORTANT: Allow Kubernetes probes to access health endpoint without authentication
+                        .antMatchers("/actuator/health").permitAll()
                         .anyRequest()
                         .authenticated());
     }
-
 }
