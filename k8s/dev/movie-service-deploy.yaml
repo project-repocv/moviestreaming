@@ -33,6 +33,18 @@ spec:
             configMapKeyRef:
               name: cinevision-config
               key: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+        - name: SPRING_DATASOURCE_URL
+          value: "jdbc:postgresql://postgres.cinevision-dev.svc.cluster.local:5432/cinevision_movies"
+        - name: SPRING_DATASOURCE_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: cinevision-secrets
+              key: DB_USERNAME
+        - name: SPRING_DATASOURCE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: cinevision-secrets
+              key: DB_PASSWORD
         - name: DB_URL
           value: "jdbc:postgresql://postgres.cinevision-dev.svc.cluster.local:5432/cinevision_movies"
         - name: DB_USERNAME
