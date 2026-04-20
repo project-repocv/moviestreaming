@@ -1,249 +1,249 @@
-name: Pre‑Merge Validation (Gitflow)
+# name: Pre‑Merge Validation (Gitflow)
 
-# Trigger on pull requests to branches commonly used in Gitflow
-on:
-  pull_request:
-    branches:
-      - develop
-      - main
-      - 'release/**'
-      - 'hotfix/**'
+# # Trigger on pull requests to branches commonly used in Gitflow
+# on:
+#   pull_request:
+#     branches:
+#       - develop
+#       - main
+#       - 'release/**'
+#       - 'hotfix/**'
 
-# Set permissions for the GITHUB_TOKEN to minimum required
-permissions:
-  contents: read          # to check out code
-  security-events: write   # to upload SARIF results (e.g., CodeQL)
-  actions: read            # required for some actions
+# # Set permissions for the GITHUB_TOKEN to minimum required
+# permissions:
+#   contents: read          # to check out code
+#   security-events: write   # to upload SARIF results (e.g., CodeQL)
+#   actions: read            # required for some actions
 
-jobs:
-  # --------------------------------------------------------------------------
-  # Frontend validation
-  # --------------------------------------------------------------------------
-  frontend:
-    name: Frontend (React)
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./frontend   # all commands run inside frontend/
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+# jobs:
+#   # --------------------------------------------------------------------------
+#   # Frontend validation
+#   # --------------------------------------------------------------------------
+#   frontend:
+#     name: Frontend (React)
+#     runs-on: ubuntu-latest
+#     defaults:
+#       run:
+#         working-directory: ./frontend   # all commands run inside frontend/
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: frontend/package-lock.json
+#       - name: Setup Node.js
+#         uses: actions/setup-node@v4
+#         with:
+#           node-version: '20'
+#           cache: 'npm'
+#           cache-dependency-path: frontend/package-lock.json
 
-      - name: Install dependencies
-        run: npm ci
+#       - name: Install dependencies
+#         run: npm ci
 
-      - name: Lint
-        run: npm run lint          # assuming you have a lint script
+#       - name: Lint
+#         run: npm run lint          # assuming you have a lint script
 
-      - name: Run tests
-        run: npm test -- --coverage # adjust as needed
+#       - name: Run tests
+#         run: npm test -- --coverage # adjust as needed
 
-      - name: Build application
-        run: npm run build
+#       - name: Build application
+#         run: npm run build
 
-      # Optional: verify that the Dockerfile builds without errors
-      - name: Build Docker image (test only)
-        run: docker build -t frontend:test .
+#       # Optional: verify that the Dockerfile builds without errors
+#       - name: Build Docker image (test only)
+#         run: docker build -t frontend:test .
 
-  # --------------------------------------------------------------------------
-  # Backend validation
-  # --------------------------------------------------------------------------
-  backend:
-    name: Backend (Spring Boot)
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./backend
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+#   # --------------------------------------------------------------------------
+#   # Backend validation
+#   # --------------------------------------------------------------------------
+#   backend:
+#     name: Backend (Spring Boot)
+#     runs-on: ubuntu-latest
+#     defaults:
+#       run:
+#         working-directory: ./backend
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v4
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-          cache: maven          # or 'gradle' if using Gradle
+#       - name: Set up JDK 17
+#         uses: actions/setup-java@v4
+#         with:
+#           java-version: '17'
+#           distribution: 'temurin'
+#           cache: maven          # or 'gradle' if using Gradle
 
-      - name: Build with Maven (and run tests)
-        run: ./mvnw clean verify   # or `./gradlew build` for Gradle
+#       - name: Build with Maven (and run tests)
+#         run: ./mvnw clean verify   # or `./gradlew build` for Gradle
 
-      # Static analysis (example with Checkstyle)
-      - name: Run Checkstyle
-        run: ./mvnw checkstyle:check
+#       # Static analysis (example with Checkstyle)
+#       - name: Run Checkstyle
+#         run: ./mvnw checkstyle:check
 
-      # Verify backend Dockerfile builds
-      - name: Build Docker image (test only)
-        run: docker build -t backend:test .
+#       # Verify backend Dockerfile builds
+#       - name: Build Docker image (test only)
+#         run: docker build -t backend:test .
 
-  # --------------------------------------------------------------------------
-  # Security scanning (multiple tools)
-  # --------------------------------------------------------------------------
-  security:
-    name: Security & Dependency Scans
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+#   # --------------------------------------------------------------------------
+#   # Security scanning (multiple tools)
+#   # --------------------------------------------------------------------------
+#   security:
+#     name: Security & Dependency Scans
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v4
 
-      # 1. CodeQL (GitHub's SAST)
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
-        with:
-          languages: javascript, java
-          queries: security-extended,security-and-quality
+#       # 1. CodeQL (GitHub's SAST)
+#       - name: Initialize CodeQL
+#         uses: github/codeql-action/init@v3
+#         with:
+#           languages: javascript, java
+#           queries: security-extended,security-and-quality
 
-      - name: Autobuild
-        uses: github/codeql-action/autobuild@v3
+#       - name: Autobuild
+#         uses: github/codeql-action/autobuild@v3
 
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
+#       - name: Perform CodeQL Analysis
+#         uses: github/codeql-action/analyze@v3
 
-      # 2. Dependency scanning with OWASP Dependency Check
-      - name: OWASP Dependency Check (Java)
-        uses: dependency-check/Dependency-Check_Action@main
-        with:
-          project: 'Backend'
-          path: './backend'
-          format: 'SARIF'
-          args: >
-            --failOnCVSS 7
-            --enableRetired
-        continue-on-error: true   # Don't fail the whole job, results will be uploaded
+#       # 2. Dependency scanning with OWASP Dependency Check
+#       - name: OWASP Dependency Check (Java)
+#         uses: dependency-check/Dependency-Check_Action@main
+#         with:
+#           project: 'Backend'
+#           path: './backend'
+#           format: 'SARIF'
+#           args: >
+#             --failOnCVSS 7
+#             --enableRetired
+#         continue-on-error: true   # Don't fail the whole job, results will be uploaded
 
-      - name: Upload Dependency Check SARIF
-        if: always()   # Upload even if previous step failed
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: ./reports/dependency-check-report.sarif
+#       - name: Upload Dependency Check SARIF
+#         if: always()   # Upload even if previous step failed
+#         uses: github/codeql-action/upload-sarif@v3
+#         with:
+#           sarif_file: ./reports/dependency-check-report.sarif
 
-      # 3. Docker image scanning with Trivy
-      - name: Build frontend Docker image (for scanning)
-        run: docker build -t frontend:test ./frontend
+#       # 3. Docker image scanning with Trivy
+#       - name: Build frontend Docker image (for scanning)
+#         run: docker build -t frontend:test ./frontend
 
-      - name: Build backend Docker image (for scanning)
-        run: docker build -t backend:test ./backend
+#       - name: Build backend Docker image (for scanning)
+#         run: docker build -t backend:test ./backend
 
-      - name: Scan frontend image with Trivy
-        uses: aquasecurity/trivy-action@0.20.0
-        with:
-          image-ref: 'frontend:test'
-          format: 'sarif'
-          output: 'trivy-frontend.sarif'
-          severity: 'CRITICAL,HIGH'
+#       - name: Scan frontend image with Trivy
+#         uses: aquasecurity/trivy-action@0.20.0
+#         with:
+#           image-ref: 'frontend:test'
+#           format: 'sarif'
+#           output: 'trivy-frontend.sarif'
+#           severity: 'CRITICAL,HIGH'
 
-      - name: Scan backend image with Trivy
-        uses: aquasecurity/trivy-action@0.20.0
-        with:
-          image-ref: 'backend:test'
-          format: 'sarif'
-          output: 'trivy-backend.sarif'
-          severity: 'CRITICAL,HIGH'
+#       - name: Scan backend image with Trivy
+#         uses: aquasecurity/trivy-action@0.20.0
+#         with:
+#           image-ref: 'backend:test'
+#           format: 'sarif'
+#           output: 'trivy-backend.sarif'
+#           severity: 'CRITICAL,HIGH'
 
-      - name: Upload Trivy SARIF results
-        if: always()
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: trivy-frontend.sarif
+#       - name: Upload Trivy SARIF results
+#         if: always()
+#         uses: github/codeql-action/upload-sarif@v3
+#         with:
+#           sarif_file: trivy-frontend.sarif
 
-      - name: Upload Trivy SARIF results (backend)
-        if: always()
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: trivy-backend.sarif
+#       - name: Upload Trivy SARIF results (backend)
+#         if: always()
+#         uses: github/codeql-action/upload-sarif@v3
+#         with:
+#           sarif_file: trivy-backend.sarif
 
-      # 4. (Optional) Snyk – if you have a Snyk account
-      # - name: Run Snyk to check for vulnerabilities
-      #   uses: snyk/actions/node@master
-      #   env:
-      #     SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-      #   with:
-      #     args: --sarif-file-output=snyk.sarif
-      # - name: Upload Snyk SARIF
-      #   if: always()
-      #   uses: github/codeql-action/upload-sarif@v3
-      #   with:
-      #     sarif_file: snyk.sarif
+#       # 4. (Optional) Snyk – if you have a Snyk account
+#       # - name: Run Snyk to check for vulnerabilities
+#       #   uses: snyk/actions/node@master
+#       #   env:
+#       #     SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+#       #   with:
+#       #     args: --sarif-file-output=snyk.sarif
+#       # - name: Upload Snyk SARIF
+#       #   if: always()
+#       #   uses: github/codeql-action/upload-sarif@v3
+#       #   with:
+#       #     sarif_file: snyk.sarif
 
-  # --------------------------------------------------------------------------
-  # Infrastructure validation (Terraform & Kubernetes)
-  # --------------------------------------------------------------------------
-  infrastructure:
-    name: Infrastructure (Terraform + K8s)
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+#   # --------------------------------------------------------------------------
+#   # Infrastructure validation (Terraform & Kubernetes)
+#   # --------------------------------------------------------------------------
+#   infrastructure:
+#     name: Infrastructure (Terraform + K8s)
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v4
 
-      # ---------- Terraform ----------
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.7.0
+#       # ---------- Terraform ----------
+#       - name: Setup Terraform
+#         uses: hashicorp/setup-terraform@v3
+#         with:
+#           terraform_version: 1.7.0
 
-      - name: Terraform fmt
-        run: terraform fmt -check -recursive ./infrastructure/terraform
-        continue-on-error: true   # Format issues shouldn't fail the whole pipeline, but they are reported
+#       - name: Terraform fmt
+#         run: terraform fmt -check -recursive ./infrastructure/terraform
+#         continue-on-error: true   # Format issues shouldn't fail the whole pipeline, but they are reported
 
-      - name: Terraform init (for validation)
-        run: terraform -chdir=./infrastructure/terraform init -backend=false
+#       - name: Terraform init (for validation)
+#         run: terraform -chdir=./infrastructure/terraform init -backend=false
 
-      - name: Terraform validate
-        run: terraform -chdir=./infrastructure/terraform validate
+#       - name: Terraform validate
+#         run: terraform -chdir=./infrastructure/terraform validate
 
-      # Terraform security scan with tfsec
-      - name: Run tfsec
-        uses: aquasecurity/tfsec-action@v1.0.3
-        with:
-          working_directory: ./infrastructure/terraform
-          format: sarif
-          output_file: tfsec.sarif
-          soft_fail: true   # Do not fail the job; results will be uploaded
+#       # Terraform security scan with tfsec
+#       - name: Run tfsec
+#         uses: aquasecurity/tfsec-action@v1.0.3
+#         with:
+#           working_directory: ./infrastructure/terraform
+#           format: sarif
+#           output_file: tfsec.sarif
+#           soft_fail: true   # Do not fail the job; results will be uploaded
 
-      - name: Upload tfsec SARIF results
-        if: always()
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: tfsec.sarif
+#       - name: Upload tfsec SARIF results
+#         if: always()
+#         uses: github/codeql-action/upload-sarif@v3
+#         with:
+#           sarif_file: tfsec.sarif
 
-      # Alternative: Checkov for Terraform & K8s
-      - name: Run Checkov (Terraform & K8s)
-        uses: bridgecrewio/checkov-action@v12
-        with:
-          directory: infrastructure/
-          framework: terraform,kubernetes
-          output_format: sarif
-          output_file_path: checkov.sarif
-          soft_fail: true
+#       # Alternative: Checkov for Terraform & K8s
+#       - name: Run Checkov (Terraform & K8s)
+#         uses: bridgecrewio/checkov-action@v12
+#         with:
+#           directory: infrastructure/
+#           framework: terraform,kubernetes
+#           output_format: sarif
+#           output_file_path: checkov.sarif
+#           soft_fail: true
 
-      - name: Upload Checkov SARIF results
-        if: always()
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: checkov.sarif
+#       - name: Upload Checkov SARIF results
+#         if: always()
+#         uses: github/codeql-action/upload-sarif@v3
+#         with:
+#           sarif_file: checkov.sarif
 
-      # ---------- Kubernetes manifest validation ----------
-      - name: Install kube-score
-        run: |
-          curl -L https://github.com/zegl/kube-score/releases/download/v1.16.0/kube-score_1.16.0_linux_amd64 -o kube-score
-          chmod +x kube-score
-          sudo mv kube-score /usr/local/bin/
+#       # ---------- Kubernetes manifest validation ----------
+#       - name: Install kube-score
+#         run: |
+#           curl -L https://github.com/zegl/kube-score/releases/download/v1.16.0/kube-score_1.16.0_linux_amd64 -o kube-score
+#           chmod +x kube-score
+#           sudo mv kube-score /usr/local/bin/
 
-      - name: Run kube-score on all Kubernetes manifests
-        run: |
-          find ./infrastructure/kubernetes -name '*.yaml' -exec kube-score score {} \;
-        continue-on-error: true
+#       - name: Run kube-score on all Kubernetes manifests
+#         run: |
+#           find ./infrastructure/kubernetes -name '*.yaml' -exec kube-score score {} \;
+#         continue-on-error: true
 
-      # You can also integrate conftest with OPA policies
-      # - name: Conftest
-      #   uses: instrumenta/conftest-action@v0.1.0
-      #   with:
-      #     files: ./infrastructure/kubernetes
-      #     policy: ./policy  # if you have custom policies
+#       # You can also integrate conftest with OPA policies
+#       # - name: Conftest
+#       #   uses: instrumenta/conftest-action@v0.1.0
+#       #   with:
+#       #     files: ./infrastructure/kubernetes
+#       #     policy: ./policy  # if you have custom policies
